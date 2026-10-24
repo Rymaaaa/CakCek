@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>CleanFix AC — Servis & Cuci AC Bergaransi 30 Hari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/jpeg" href="/assets/logo.jpg">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans:  ['Space Grotesk', 'sans-serif'],
+                        mono:  ['Space Mono', 'monospace'],
+                    },
+                    colors: {
+                        navy:  { DEFAULT: '#0d1b2a', 800: '#1a2e42', 700: '#243b55' },
+                        lime:  { DEFAULT: '#b8ff57', dark: '#8fd43a' },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ── Base ── */
+        body { background: #0d1b2a; color: #f0f4f8; }
+
+        /* ── Counter animation ── */
+        @keyframes count-up {
+            from { opacity: 0; transform: translateY(16px) scale(0.9); }
+            to   { opacity: 1; transform: translateY(0)   scale(1); }
+        }
+        .count-anim { animation: count-up 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+
+        /* ── Reveal from bottom ── */
+        @keyframes reveal-up {
+            from { opacity: 0; transform: translateY(40px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .r1 { animation: reveal-up 0.8s 0.1s ease both; }
+        .r2 { animation: reveal-up 0.8s 0.25s ease both; }
+        .r3 { animation: reveal-up 0.8s 0.4s ease both; }
+        .r4 { animation: reveal-up 0.8s 0.55s ease both; }
+
+        /* ── Scan line on hero image ── */
+        @keyframes scan {
+            0%   { top: -6%; }
+            100% { top: 108%; }
+        }
+        .scan-line {
+            position: absolute; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, #b8ff57 40%, #b8ff57 60%, transparent);
+            animation: scan 3.5s ease-in-out infinite;
+            opacity: 0.55;
+        }
+
+        /* ── Lime border glow on hover ── */
+        .card-hover {
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: border-color 0.25s, box-shadow 0.3s, transform 0.35s cubic-bezier(0.16,1,0.3,1);
+        }
+        .card-hover:hover {
+            border-color: #b8ff57;
+            box-shadow: 0 0 32px -8px rgba(184,255,87,0.22);
+            transform: translateY(-4px);
+        }
+
+        /* ── Service image zoom ── */
+        .svc-img { transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+        .svc-card:hover .svc-img { transform: scale(1.06); }
+
+        /* ── Step line ── */
+        .step-connector {
+            width: 2px;
+            background: linear-gradient(to bottom, #b8ff57, rgba(184,255,87,0.1));
+        }
+
+        /* ── Blink cursor ── */
+        @keyframes blink { 50% { opacity: 0; } }
+        .cursor { animation: blink 1.1s step-start infinite; }
+
+        /* ── Ping dot ── */
+        @keyframes ping-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50%       { transform: scale(1.7); opacity: 0.3; }
+        }
+        .ping-dot { animation: ping-dot 2s ease-in-out infinite; }
+
+        /* ── Calc ── */
+        [x-cloak] { display: none !important; }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0d1b2a; }
+        ::-webkit-scrollbar-thumb { background: #243b55; border-radius: 99px; }
+
+        /* ── WA button pulse ── */
+        @keyframes wa-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(184,255,87,0.5); }
+            50%       { box-shadow: 0 0 0 10px rgba(184,255,87,0); }
+        }
+        .wa-pulse { animation: wa-pulse 2.5s ease infinite; }
+
+        /* ════════════════════════════════════════
+           SCROLL ANIMATIONS — Intersection Observer
+           ════════════════════════════════════════ */
+
+        /* -- Base state: semua elemen scroll mulai invisible -- */
+        .sa-fade    { opacity: 0; transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1); transform: translateY(32px); }
+        .sa-left    { opacity: 0; transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1); transform: translateX(-40px); }
+        .sa-right   { opacity: 0; transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1); transform: translateX(40px); }
+        .sa-scale   { opacity: 0; transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34,1.56,0.64,1); transform: scale(0.88); }
+        .sa-line    { transform: scaleX(0); transform-origin: left; transition: transform 0.9s cubic-bezier(0.16,1,0.3,1); }
+        .sa-number  { opacity: 0; transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1); transform: translateY(20px) scale(0.85); }
+
+        /* -- Visible state (class ditambah JS) -- */
+        .sa-visible { opacity: 1 !important; transform: none !important; }
+
+        /* -- Stagger delays untuk group elemen -- */
+        .sa-d1 { transition-delay: 0.05s; }
+        .sa-d2 { transition-delay: 0.15s; }
+        .sa-d3 { transition-delay: 0.25s; }
+        .sa-d4 { transition-delay: 0.35s; }
+        .sa-d5 { transition-delay: 0.45s; }
+
+        /* -- Progress bar animasi -- */
+        @keyframes bar-fill {
+            from { width: 0%; }
+            to   { width: var(--bar-width, 100%); }
+        }
+        .sa-bar { width: 0; transition: width 1.2s cubic-bezier(0.16,1,0.3,1); }
+        .sa-bar.sa-visible { width: var(--bar-width, 100%); }
+
+        /* -- Glow reveal untuk heading section -- */
+        @keyframes glow-reveal {
+            0%   { opacity: 0; text-shadow: 0 0 60px rgba(184,255,87,0.8); transform: translateY(16px); }
+            60%  { text-shadow: 0 0 20px rgba(184,255,87,0.3); }
+            100% { opacity: 1; text-shadow: none; transform: translateY(0); }
+        }
+        .sa-glow { opacity: 0; }
+        .sa-glow.sa-visible { animation: glow-reveal 0.9s cubic-bezier(0.16,1,0.3,1) both; }
+
+        /* -- Clip wipe dari kiri ke kanan -- */
+        .sa-wipe {
+            clip-path: inset(0 100% 0 0);
+            transition: clip-path 0.9s cubic-bezier(0.16,1,0.3,1);
+        }
+        .sa-wipe.sa-visible { clip-path: inset(0 0% 0 0); }
+
+        /* -- Highlight bar lime (dekoratif) -- */
+        .sa-bar-lime {
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+        }
+        .sa-bar-lime.sa-visible { transform: scaleX(1); }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden w-full font-sans">
+
+    <!-- ░░ STICKY NAVBAR ░░ -->
+    <nav class="sticky top-0 z-50 border-b border-white/10 backdrop-blur-xl" style="background:rgba(13,27,42,0.92)">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 flex items-center justify-center font-mono font-bold text-sm"
+                     style="background:#b8ff57; color:#0d1b2a;">CF</div>
+                <div class="leading-none">
+                    <span class="block font-bold text-base text-white tracking-tight">CleanFix AC</span>
+                    <span class="block text-[10px] text-white/40 tracking-widest uppercase font-mono">Servis Bergaransi</span>
+                </div>
+            </a>
+
+            <!-- Nav links -->
+            <div class="hidden md:flex items-center gap-6 text-[11px] font-semibold uppercase tracking-widest text-white/50">
+                <a href="#keluhan"  class="hover:text-white transition-colors">Keluhan</a>
+                <a href="#tarif"    class="hover:text-white transition-colors">Tarif</a>
+                <a href="#estimasi" class="hover:text-white transition-colors">Estimasi</a>
+                <a href="#sop"      class="hover:text-white transition-colors">SOP</a>
+            </div>
+
+            <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20saya%20mau%20booking%20teknisi%20AC"
+               target="_blank"
+               class="wa-pulse inline-flex items-center gap-2 px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest transition-all"
+               style="background:#b8ff57; color:#0d1b2a;">
+                Panggil Teknisi
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ░░ HERO ░░ -->
+    <header class="relative min-h-[92vh] flex flex-col lg:flex-row overflow-hidden">
+
+        <!-- Teks hero -->
+        <div class="relative z-10 flex flex-col justify-center px-6 sm:px-12 lg:px-20 py-20 lg:w-1/2">
+            <!-- Live badge -->
+            <div class="r1 inline-flex items-center gap-2.5 mb-8 self-start px-4 py-2 rounded-full border border-white/10" style="background:rgba(255,255,255,0.05)">
+                <span class="ping-dot block w-2 h-2 rounded-full" style="background:#b8ff57;"></span>
+                <span class="text-[11px] font-mono tracking-widest text-white/70">TEKNISI ONLINE — JABODETABEK</span>
+            </div>
+
+            <h1 class="r2 font-bold leading-[0.95] mb-6" style="font-size:clamp(3rem,9vw,6.5rem); color:#fff;">
+                AC<br>
+                <span style="color:#b8ff57;">BOCOR?</span><br>
+                <span style="color:rgba(255,255,255,0.35);">KAMI URUS.</span>
+            </h1>
+
+            <p class="r3 text-base leading-relaxed mb-10 max-w-sm" style="color:rgba(255,255,255,0.55);">
+                Teknisi berpengalaman datang ke rumah Anda. Harga transparan, tidak ada biaya kejutan, dan garansi dingin 30 hari.
+            </p>
+
+            <div class="r4 flex flex-col sm:flex-row gap-3">
+                <a href="#estimasi"
+                   class="inline-flex justify-center items-center gap-2 px-8 py-4 font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-90"
+                   style="background:#b8ff57; color:#0d1b2a;">
+                    Hitung Biaya Dulu
+                </a>
+                <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20AC%20saya%20bermasalah.%20Bisa%20booking%3F"
+                   target="_blank"
+                   class="inline-flex justify-center items-center gap-2 px-8 py-4 font-bold text-[11px] uppercase tracking-widest border transition-all"
+                   style="border-color:rgba(255,255,255,0.2); color:white;">
+                    Booking via WA
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.793.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="mt-14 pt-8 border-t grid grid-cols-3 gap-4" style="border-color:rgba(255,255,255,0.08)">
+                <div>
+                    <p class="font-mono font-bold text-3xl" style="color:#b8ff57;">1.8K<span class="text-xl">+</span></p>
+                    <p class="text-[10px] font-semibold uppercase tracking-widest mt-1" style="color:rgba(255,255,255,0.35);">Unit Selesai</p>
+                </div>
+                <div>
+                    <p class="font-mono font-bold text-3xl text-white">30</p>
+                    <p class="text-[10px] font-semibold uppercase tracking-widest mt-1" style="color:rgba(255,255,255,0.35);">Hari Garansi</p>
+                </div>
+                <div>
+                    <p class="font-mono font-bold text-3xl text-white">15<span class="text-xl" style="color:#b8ff57;">'</span></p>
+                    <p class="text-[10px] font-semibold uppercase tracking-widest mt-1" style="color:rgba(255,255,255,0.35);">Respon WA</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero image dengan scanline -->
+        <div class="relative lg:w-1/2 h-72 sm:h-96 lg:h-auto overflow-hidden order-first lg:order-last"
+             style="min-height:300px;">
+            <!-- Scan line animasi -->
+            <div class="scan-line"></div>
+
+            <img src="/assets/ac_hero.jpg" alt="Teknisi CleanFix sedang bekerja"
+                 class="w-full h-full object-cover object-center" style="filter:saturate(0.7);">
+
+            <!-- Overlay gradient -->
+            <div class="absolute inset-0"
+                 style="background:linear-gradient(to right, #0d1b2a 0%, rgba(13,27,42,0.4) 40%, rgba(13,27,42,0) 100%);"></div>
+            <!-- Overlay bawah mobile -->
+            <div class="absolute inset-0 lg:hidden"
+                 style="background:linear-gradient(to top, #0d1b2a 10%, rgba(13,27,42,0) 60%);"></div>
+
+            <!-- Corner tag -->
+            <div class="absolute top-5 right-5 px-3 py-1.5 font-mono text-[10px] tracking-widest"
+                 style="background:rgba(13,27,42,0.7); color:#b8ff57; border:1px solid rgba(184,255,87,0.25); backdrop-filter:blur(8px);">
+                TEKNISI TERVERIFIKASI
+            </div>
+        </div>
+
+    </header>
+
+    <!-- ░░ KELUHAN — QUICK DIAGNOSIS ░░ -->
+    <section id="keluhan" class="py-20 px-4 sm:px-6" style="background:#111c2b;">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-12">
+                <p class="sa-left font-mono text-[11px] tracking-widest mb-3" style="color:#b8ff57;">— PILIH MASALAH AC ANDA</p>
+                <h2 class="sa-glow font-bold text-3xl sm:text-4xl text-white leading-tight">Apa yang terjadi<br>pada AC Anda?</h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Card 1 -->
+                <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20AC%20saya%20tidak%20dingin.%20Bisa%20bantu%3F"
+                   target="_blank"
+                   class="sa-fade sa-d1 card-hover group block p-6 rounded-none"
+                   style="background:#1a2e42;">
+                    <div class="text-3xl mb-4">🌡️</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Tidak Dingin</h3>
+                    <p class="text-sm leading-relaxed mb-5" style="color:rgba(255,255,255,0.45);">AC nyala tapi ruangan tetap panas. Bisa freon habis atau kompresor.</p>
+                    <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest" style="color:#b8ff57;">
+                        Chat Sekarang
+                        <svg class="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </span>
+                </a>
+
+                <!-- Card 2 -->
+                <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20AC%20saya%20bocor%20air.%20Bisa%20bantu%3F"
+                   target="_blank"
+                   class="sa-fade sa-d2 card-hover group block p-6"
+                   style="background:#1a2e42;">
+                    <div class="text-3xl mb-4">💧</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Bocor Air</h3>
+                    <p class="text-sm leading-relaxed mb-5" style="color:rgba(255,255,255,0.45);">Air menetes dari unit indoor. Biasanya drain tersumbat atau debu menumpuk.</p>
+                    <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest" style="color:#b8ff57;">
+                        Chat Sekarang
+                        <svg class="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </span>
+                </a>
+
+                <!-- Card 3 -->
+                <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20AC%20saya%20bau%20apek.%20Bisa%20bantu%3F"
+                   target="_blank"
+                   class="sa-fade sa-d3 card-hover group block p-6"
+                   style="background:#1a2e42;">
+                    <div class="text-3xl mb-4">💨</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Bau Tidak Enak</h3>
+                    <p class="text-sm leading-relaxed mb-5" style="color:rgba(255,255,255,0.45);">Hembusan AC bau apek atau musty. Saatnya cuci dalam + desinfektan.</p>
+                    <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest" style="color:#b8ff57;">
+                        Chat Sekarang
+                        <svg class="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </span>
+                </a>
+
+                <!-- Card 4 -->
+                <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20AC%20saya%20berisik.%20Bisa%20bantu%3F"
+                   target="_blank"
+                   class="sa-fade sa-d4 card-hover group block p-6"
+                   style="background:#1a2e42;">
+                    <div class="text-3xl mb-4">🔊</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Berisik / Bunyi</h3>
+                    <p class="text-sm leading-relaxed mb-5" style="color:rgba(255,255,255,0.45);">Suara aneh dari indoor atau outdoor. Mungkin fan blade atau bearing aus.</p>
+                    <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest" style="color:#b8ff57;">
+                        Chat Sekarang
+                        <svg class="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ░░ TARIF — LAYANAN ░░ -->
+    <section id="tarif" class="py-20 px-4 sm:px-6" style="background:#0d1b2a;">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
+                <div>
+                    <p class="font-mono text-[11px] tracking-widest mb-3" style="color:#b8ff57;">— TARIF LAYANAN</p>
+                    <h2 class="font-bold text-3xl sm:text-4xl text-white">Harga transparan.<br>Tidak ada biaya tersembunyi.</h2>
+                </div>
+                <p class="text-sm" style="color:rgba(255,255,255,0.4);">Harga sudah termasuk<br>biaya kedatangan & material dasar.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+                <!-- Layanan 1: Cuci AC -->
+                <div class="svc-card card-hover overflow-hidden" style="background:#1a2e42;">
+                    <div class="relative h-52 overflow-hidden">
+                        <img src="/assets/ac_cuci.jpg" alt="Cuci AC" class="svc-img w-full h-full object-cover" style="filter:saturate(0.65);">
+                        <div class="absolute inset-0" style="background:linear-gradient(to top, #1a2e42 5%, transparent 60%);"></div>
+                        <span class="absolute top-4 left-4 font-mono text-[10px] tracking-widest px-2.5 py-1"
+                              style="background:rgba(13,27,42,0.75); color:#b8ff57; border:1px solid rgba(184,255,87,0.25); backdrop-filter:blur(6px);">01 / CUCI</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl text-white mb-1.5">Cuci AC Standar</h3>
+                        <p class="text-sm leading-relaxed mb-5" style="color:rgba(255,255,255,0.45);">Bersihkan filter, evaporator, blower, dan drain. Cocok untuk servis rutin 3 bulan sekali.</p>
+                        <div class="flex items-end justify-between">
+                            <div>
+                                <p class="font-mono text-2xl font-bold text-white">Rp 120<span class="text-base">.000</span></p>
+                                <p class="text-[10px] font-semibold uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.3);">per unit</p>
+                            </div>
+                            <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20saya%20mau%20cuci%20AC.%20Booking%20dong!"
+                               target="_blank"
+                               class="inline-flex items-center gap-1.5 px-4 py-2.5 font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-80"
+                               style="background:#b8ff57; color:#0d1b2a;">
+                                Booking
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layanan 2: Isi Freon -->
+                <div class="svc-card card-hover overflow-hidden" style="background:#1a2e42;">
+                    <div class="relative h-52 overflow-hidden">
+                        <img src="/assets/ac_freon.jpg" alt="Isi Freon AC" class="svc-img w-full h-full object-cover" style="filter:saturate(0.65);">
+                        <div class="absolute inset-0" style="background:linear-gradient(to top, #1a2e42 5%, transparent 60%);"></div>
+                        <span class="absolute top-4 left-4 font-mono text-[10px] tracking-widest px-2.5 py-1"
+                              style="background:rgba(13,27,42,0.75); color:#b8ff57; border:1px solid rgba(184,255,87,0.25); backdrop-filter:blur(6px);">02 / FREON</span>
+                        <!-- Popular badge -->
+                        <span class="absolute top-4 right-4 font-mono text-[10px] tracking-widest px-2.5 py-1 font-bold"
+                              style="background:#b8ff57; color:#0d1b2a;">TERLARIS</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl text-white mb-1.5">Isi Ulang Freon</h3>
+                        <p class="text-sm leading-relaxed mb-5" style="color:rgba(255,255,255,0.45);">Cek tekanan dan isi freon sesuai spesifikasi. Uji suhu digital sebelum & sesudah pengisian.</p>
+                        <div class="flex items-end justify-between">
+                            <div>
+                                <p class="font-mono text-2xl font-bold text-white">Rp 200<span class="text-base">.000</span></p>
+                                <p class="text-[10px] font-semibold uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.3);">per unit</p>
+                            </div>
+                            <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20saya%20mau%20isi%20freon.%20Booking%20dong!"
+                               target="_blank"
+                               class="inline-flex items-center gap-1.5 px-4 py-2.5 font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-80"
+                               style="background:#b8ff57; color:#0d1b2a;">
+                                Booking
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layanan 3: Bongkar Pasang -->
+                <div class="svc-card card-hover overflow-hidden" style="background:#1a2e42;">
+                    <div class="relative h-52 overflow-hidden">
+                        <img src="/assets/ac_reparasi.jpg" alt="Bongkar Pasang AC" class="svc-img w-full h-full object-cover" style="filter:saturate(0.65);">
+                        <div class="absolute inset-0" style="background:linear-gradient(to top, #1a2e42 5%, transparent 60%);"></div>
+                        <span class="absolute top-4 left-4 font-mono text-[10px] tracking-widest px-2.5 py-1"
+                              style="background:rgba(13,27,42,0.75); color:#b8ff57; border:1px solid rgba(184,255,87,0.25); backdrop-filter:blur(6px);">03 / PASANG</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl text-white mb-1.5">Bongkar & Pasang</h3>
+                        <p class="text-sm leading-relaxed mb-5" style="color:rgba(255,255,255,0.45);">Pindah unit AC ke lokasi baru atau pasang unit baru. Termasuk uji kebocoran pipa.</p>
+                        <div class="flex items-end justify-between">
+                            <div>
+                                <p class="font-mono text-2xl font-bold text-white">Rp 350<span class="text-base">.000</span></p>
+                                <p class="text-[10px] font-semibold uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.3);">per unit</p>
+                            </div>
+                            <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20saya%20mau%20bongkar%20pasang%20AC.%20Booking%20dong!"
+                               target="_blank"
+                               class="inline-flex items-center gap-1.5 px-4 py-2.5 font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-80"
+                               style="background:#b8ff57; color:#0d1b2a;">
+                                Booking
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ░░ KALKULATOR ESTIMASI ░░ -->
+    <section id="estimasi" class="py-20 px-4 sm:px-6" style="background:#111c2b;">
+        <div class="max-w-5xl mx-auto">
+            <div class="mb-12">
+                <p class="font-mono text-[11px] tracking-widest mb-3" style="color:#b8ff57;">— KALKULATOR BIAYA</p>
+                <h2 class="font-bold text-3xl sm:text-4xl text-white">Tahu biayanya<br>sebelum kami datang.</h2>
+            </div>
+
+            <div x-data="{
+                layanan: '',
+                unit: 1,
+                jadwal: 'reguler',
+                prices: { cuci: 120000, freon: 200000, pasang: 350000 },
+                labels: { cuci: 'Cuci AC Standar', freon: 'Isi Ulang Freon', pasang: 'Bongkar & Pasang' },
+                get subtotal() {
+                    if (!this.layanan) return 0;
+                    return this.prices[this.layanan] * this.unit;
+                },
+                get surcharge() {
+                    return this.jadwal === 'express' ? Math.round(this.subtotal * 0.2) : 0;
+                },
+                get total() {
+                    return this.subtotal + this.surcharge;
+                },
+                get waText() {
+                    if (!this.layanan) return '';
+                    const l = this.labels[this.layanan];
+                    return `Halo%20CleanFix%2C%20saya%20mau%20${encodeURIComponent(l)}%20untuk%20${this.unit}%20unit%20(${this.jadwal}%20schedule).%20Total%20estimasi%20Rp%20${this.total.toLocaleString('id-ID')}.%20Bisa%20booking%3F`;
+                }
+            }">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Pilihan -->
+                    <div class="p-8 border border-white/10" style="background:#1a2e42;">
+                        <!-- Layanan -->
+                        <div class="mb-6">
+                            <label class="block font-mono text-[10px] tracking-widest mb-3" style="color:#b8ff57;">LAYANAN</label>
+                            <div class="grid grid-cols-1 gap-2">
+                                <template x-for="[key, label, price] in [['cuci','Cuci AC Standar','Rp 120.000'], ['freon','Isi Ulang Freon','Rp 200.000'], ['pasang','Bongkar & Pasang','Rp 350.000']]">
+                                    <button @click="layanan = key"
+                                            :class="layanan === key ? 'border-[#b8ff57] text-white' : 'border-white/10 text-white/50 hover:border-white/30'"
+                                            class="flex justify-between items-center px-4 py-3.5 border text-sm font-semibold text-left transition-all w-full"
+                                            style="background:rgba(255,255,255,0.03);">
+                                        <span x-text="label"></span>
+                                        <span class="font-mono text-xs" :style="layanan === key ? 'color:#b8ff57' : 'color:rgba(255,255,255,0.3)'" x-text="price"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Jumlah unit -->
+                        <div class="mb-6">
+                            <label class="block font-mono text-[10px] tracking-widest mb-3" style="color:#b8ff57;">JUMLAH UNIT</label>
+                            <div class="flex items-center gap-4">
+                                <button @click="unit = Math.max(1, unit - 1)"
+                                        class="w-10 h-10 flex items-center justify-center border font-mono font-bold text-lg transition-all"
+                                        style="border-color:rgba(255,255,255,0.2); color:white;">−</button>
+                                <span class="font-mono font-bold text-3xl text-white w-10 text-center" x-text="unit"></span>
+                                <button @click="unit = Math.min(10, unit + 1)"
+                                        class="w-10 h-10 flex items-center justify-center border font-mono font-bold text-lg transition-all"
+                                        style="border-color:rgba(255,255,255,0.2); color:white;">+</button>
+                                <span class="text-xs font-semibold ml-2" style="color:rgba(255,255,255,0.35);">maks. 10 unit</span>
+                            </div>
+                        </div>
+
+                        <!-- Jadwal -->
+                        <div>
+                            <label class="block font-mono text-[10px] tracking-widest mb-3" style="color:#b8ff57;">JADWAL</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button @click="jadwal = 'reguler'"
+                                        :class="jadwal === 'reguler' ? 'border-[#b8ff57] text-white' : 'border-white/10 text-white/50'"
+                                        class="px-4 py-3 border text-sm font-semibold transition-all" style="background:rgba(255,255,255,0.03);">
+                                    Reguler
+                                    <span class="block text-[10px] font-mono" :style="jadwal==='reguler'?'color:#b8ff57':'color:rgba(255,255,255,0.3)'">Besok / 1–2 Hari</span>
+                                </button>
+                                <button @click="jadwal = 'express'"
+                                        :class="jadwal === 'express' ? 'border-[#b8ff57] text-white' : 'border-white/10 text-white/50'"
+                                        class="px-4 py-3 border text-sm font-semibold transition-all" style="background:rgba(255,255,255,0.03);">
+                                    Express
+                                    <span class="block text-[10px] font-mono" :style="jadwal==='express'?'color:#b8ff57':'color:rgba(255,255,255,0.3)'">Hari Ini +20%</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hasil -->
+                    <div class="p-8 flex flex-col justify-between border border-white/10" style="background:#1a2e42;">
+                        <div>
+                            <p class="font-mono text-[10px] tracking-widest mb-6" style="color:#b8ff57;">RINGKASAN BIAYA</p>
+
+                            <div x-show="!layanan" class="text-center py-10">
+                                <p class="font-mono text-white/20 text-sm">Pilih layanan<br>untuk melihat estimasi</p>
+                            </div>
+
+                            <div x-show="layanan" x-cloak class="space-y-4">
+                                <div class="flex justify-between text-sm">
+                                    <span style="color:rgba(255,255,255,0.5);">Layanan</span>
+                                    <span class="font-semibold text-white" x-text="labels[layanan]"></span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span style="color:rgba(255,255,255,0.5);">Jumlah unit</span>
+                                    <span class="font-mono font-bold text-white" x-text="unit + ' unit'"></span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span style="color:rgba(255,255,255,0.5);">Subtotal</span>
+                                    <span class="font-mono text-white" x-text="'Rp ' + subtotal.toLocaleString('id-ID')"></span>
+                                </div>
+                                <div x-show="jadwal === 'express'" class="flex justify-between text-sm">
+                                    <span style="color:rgba(255,255,255,0.5);">Express (+20%)</span>
+                                    <span class="font-mono" style="color:#b8ff57;" x-text="'+ Rp ' + surcharge.toLocaleString('id-ID')"></span>
+                                </div>
+                                <div class="pt-4 border-t" style="border-color:rgba(255,255,255,0.1);">
+                                    <div class="flex justify-between items-end">
+                                        <span class="text-sm font-semibold" style="color:rgba(255,255,255,0.5);">Total Estimasi</span>
+                                        <span class="font-mono font-bold text-3xl text-white" x-text="'Rp ' + total.toLocaleString('id-ID')"></span>
+                                    </div>
+                                    <p class="text-[10px] mt-1.5" style="color:rgba(255,255,255,0.3);">Harga final dapat berubah setelah teknisi cek kondisi lapangan.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <a x-show="layanan" x-cloak
+                               :href="'https://wa.me/6281234567890?text=' + waText"
+                               target="_blank"
+                               class="wa-pulse flex justify-center items-center gap-2 w-full py-4 font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-85"
+                               style="background:#b8ff57; color:#0d1b2a;">
+                                Booking via WhatsApp
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.793.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                            </a>
+                            <div x-show="!layanan" class="flex justify-center items-center gap-2 w-full py-4 font-bold text-[11px] uppercase tracking-widest border" style="border-color:rgba(255,255,255,0.1); color:rgba(255,255,255,0.2);">
+                                Pilih Layanan Dulu
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ░░ SOP KERJA ░░ -->
+    <section id="sop" class="py-20 px-4 sm:px-6" style="background:#0d1b2a;">
+        <div class="max-w-5xl mx-auto">
+            <div class="mb-14">
+                <p class="font-mono text-[11px] tracking-widest mb-3" style="color:#b8ff57;">— CARA KERJA KAMI</p>
+                <h2 class="font-bold text-3xl sm:text-4xl text-white">4 langkah.<br>Beres.</h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Step 1 -->
+                <div class="relative">
+                    <div class="font-mono text-6xl font-bold leading-none mb-4" style="color:rgba(184,255,87,0.15);">01</div>
+                    <div class="mb-3 w-10 h-10 flex items-center justify-center text-lg" style="background:rgba(184,255,87,0.1); border:1px solid rgba(184,255,87,0.25);">📲</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Kirim Lokasi</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.4);">Chat via WhatsApp. Ceritakan masalahnya dan kirim pin lokasi Anda.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="relative">
+                    <div class="font-mono text-6xl font-bold leading-none mb-4" style="color:rgba(184,255,87,0.15);">02</div>
+                    <div class="mb-3 w-10 h-10 flex items-center justify-center text-lg" style="background:rgba(184,255,87,0.1); border:1px solid rgba(184,255,87,0.25);">📋</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Konfirmasi Jadwal</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.4);">Kami konfirmasi harga dan jadwal kedatangan. Tidak ada biaya survey.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="relative">
+                    <div class="font-mono text-6xl font-bold leading-none mb-4" style="color:rgba(184,255,87,0.15);">03</div>
+                    <div class="mb-3 w-10 h-10 flex items-center justify-center text-lg" style="background:rgba(184,255,87,0.1); border:1px solid rgba(184,255,87,0.25);">🔧</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Teknisi Datang</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.4);">Teknisi tiba rapi, pakai terpal pelindung, dan mulai kerjakan AC Anda.</p>
+                </div>
+                <!-- Step 4 -->
+                <div class="relative">
+                    <div class="font-mono text-6xl font-bold leading-none mb-4" style="color:rgba(184,255,87,0.15);">04</div>
+                    <div class="mb-3 w-10 h-10 flex items-center justify-center text-lg" style="background:rgba(184,255,87,0.1); border:1px solid rgba(184,255,87,0.25);">✅</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Garansi 30 Hari</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.4);">Setelah selesai, Anda mendapat kartu garansi. Tidak dingin lagi? Kami kembali gratis.</p>
+                </div>
+            </div>
+
+            <!-- Jaminan bar -->
+            <div class="mt-16 pt-10 border-t" style="border-color:rgba(255,255,255,0.08);">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div>
+                        <p class="font-mono font-bold text-xl mb-1 text-white">Bergaransi</p>
+                        <p class="text-[11px] font-semibold tracking-widest uppercase" style="color:rgba(255,255,255,0.3);">30 Hari Garansi</p>
+                    </div>
+                    <div>
+                        <p class="font-mono font-bold text-xl mb-1 text-white">Transparan</p>
+                        <p class="text-[11px] font-semibold tracking-widest uppercase" style="color:rgba(255,255,255,0.3);">Harga Pasti di Awal</p>
+                    </div>
+                    <div>
+                        <p class="font-mono font-bold text-xl mb-1 text-white">Rapi & Bersih</p>
+                        <p class="text-[11px] font-semibold tracking-widest uppercase" style="color:rgba(255,255,255,0.3);">Pakai Terpal Pelindung</p>
+                    </div>
+                    <div>
+                        <p class="font-mono font-bold text-xl mb-1 text-white">Terverifikasi</p>
+                        <p class="text-[11px] font-semibold tracking-widest uppercase" style="color:rgba(255,255,255,0.3);">Teknisi Berpengalaman</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ░░ FOOTER CTA ░░ -->
+    <footer style="background:#111c2b; border-top:1px solid rgba(255,255,255,0.07);">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-16 text-center">
+            <p class="font-mono text-[11px] tracking-widest mb-4" style="color:#b8ff57;">AC RUSAK?</p>
+            <h2 class="font-bold text-4xl sm:text-5xl text-white mb-6">Hubungi kami<br>sekarang.</h2>
+            <p class="text-base mb-10 max-w-md mx-auto" style="color:rgba(255,255,255,0.4);">Teknisi siaga dan siap datang hari ini di area Jabodetabek.</p>
+
+            <a href="https://wa.me/6281234567890?text=Halo%20CleanFix%2C%20AC%20saya%20bermasalah.%20Bisa%20bantu%3F"
+               target="_blank"
+               class="wa-pulse inline-flex items-center gap-3 px-10 py-4 font-bold text-sm uppercase tracking-widest transition-all hover:opacity-85"
+               style="background:#b8ff57; color:#0d1b2a;">
+                Hubungi via WhatsApp
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.793.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+            </a>
+        </div>
+
+        <!-- Back to Cakcek -->
+        <div class="text-center py-5" style="border-top:1px solid rgba(255,255,255,0.06); background:#0d1b2a;">
+            <a href="/" class="inline-flex items-center gap-2 text-[11px] font-mono tracking-widest transition-colors"
+               style="color:rgba(255,255,255,0.3);"
+               onmouseover="this.style.color='#b8ff57'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+                ← Demo oleh Cakcek · Jasa Landing Page UMKM
+            </a>
+        </div>
+    </footer>
+
+
+    <!-- ░░ SCROLL ANIMATION SCRIPT ░░ -->
+    <script>
+    (function () {
+        // ── 1. Tandai elemen yang akan dianimasikan ────────────────────────────
+
+        // Section headings: label kecil → slide dari kiri, h2 → glow
+        document.querySelectorAll('#keluhan p.font-mono, #tarif p.font-mono, #estimasi p.font-mono, #sop p.font-mono, footer p.font-mono').forEach(el => {
+            el.classList.add('sa-left');
+        });
+        document.querySelectorAll('#keluhan h2, #tarif h2, #estimasi h2, #sop h2, footer h2').forEach(el => {
+            el.classList.add('sa-glow');
+        });
+        // Subtitle kanan tarif
+        const tarifSub = document.querySelector('#tarif .flex > p.text-sm');
+        if (tarifSub) tarifSub.classList.add('sa-right');
+
+        // Kartu keluhan — fade stagger
+        document.querySelectorAll('#keluhan .card-hover').forEach((el, i) => {
+            el.classList.add('sa-fade', `sa-d${i + 1}`);
+        });
+
+        // Kartu tarif — fade stagger
+        document.querySelectorAll('#tarif .svc-card').forEach((el, i) => {
+            el.classList.add('sa-fade', `sa-d${i + 1}`);
+        });
+
+        // Kalkulator — slide dari kiri & kanan
+        const calcCols = document.querySelectorAll('#estimasi .grid > div');
+        if (calcCols[0]) calcCols[0].classList.add('sa-left');
+        if (calcCols[1]) calcCols[1].classList.add('sa-right');
+
+        // SOP steps — scale masuk stagger
+        document.querySelectorAll('#sop .grid > div').forEach((el, i) => {
+            el.classList.add('sa-scale', `sa-d${i + 1}`);
+        });
+
+        // Jaminan bar items — fade stagger
+        document.querySelectorAll('#sop .grid.grid-cols-2 > div, #sop .grid.md\\:grid-cols-4 > div').forEach((el, i) => {
+            el.classList.add('sa-fade', `sa-d${i + 1}`);
+        });
+
+        // Footer CTA button — scale
+        const footerBtn = document.querySelector('footer a.wa-pulse');
+        if (footerBtn) footerBtn.classList.add('sa-scale');
+
+        // Footer back link — fade
+        const footerBack = document.querySelector('footer div:last-child a');
+        if (footerBack) footerBack.classList.add('sa-fade');
+
+        // Stats di hero — number animate
+        document.querySelectorAll('header .grid > div').forEach((el, i) => {
+            el.classList.add('sa-number', `sa-d${i + 1}`);
+        });
+
+        // ── 2. Intersection Observer ───────────────────────────────────────────
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('sa-visible');
+                    // Hanya trigger sekali
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.12,       // 12% elemen terlihat → trigger
+            rootMargin: '0px 0px -40px 0px'  // sedikit offset bawah
+        });
+
+        // Observe semua elemen bertanda sa-*
+        const selectors = '.sa-fade, .sa-left, .sa-right, .sa-scale, .sa-glow, .sa-wipe, .sa-number';
+        document.querySelectorAll(selectors).forEach(el => observer.observe(el));
+
+        // ── 3. Counter angka di hero (saat scroll ke stats) ───────────────────
+        function animateCounter(el, target, suffix, duration) {
+            let start = null;
+            const isFloat = target % 1 !== 0;
+            const step = (timestamp) => {
+                if (!start) start = timestamp;
+                const progress = Math.min((timestamp - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // ease-out-cubic
+                const current = isFloat
+                    ? (eased * target).toFixed(1)
+                    : Math.floor(eased * target);
+                el.textContent = current + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+
+        // Observer khusus stats hero
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const p = entry.target.querySelector('p.font-mono');
+                if (!p) return;
+                const text = p.textContent.trim();
+                // parse angka & suffix
+                if (text.includes('1.8K')) {
+                    animateCounter(p, 1.8, 'K+', 1200);
+                } else if (text.includes('30')) {
+                    animateCounter(p, 30, '', 1000);
+                } else if (text.includes("15")) {
+                    // keep suffix span
+                    const numEl = p.childNodes[0];
+                    if (numEl && numEl.nodeType === Node.TEXT_NODE) {
+                        let s = null;
+                        const step = (ts) => {
+                            if (!s) s = ts;
+                            const prog = Math.min((ts - s) / 900, 1);
+                            const v = Math.floor((1 - Math.pow(1-prog, 3)) * 15);
+                            numEl.textContent = v;
+                            if (prog < 1) requestAnimationFrame(step);
+                        };
+                        requestAnimationFrame(step);
+                    }
+                }
+                statsObserver.unobserve(entry.target);
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('header .grid > div').forEach(el => statsObserver.observe(el));
+
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>URBN.ST — Urban Streetwear</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/jpeg" href="/assets/logo.jpg">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Bebas Neue', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ── Marquee ticker ── */
+        @keyframes ticker {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .ticker-track {
+            display: flex;
+            width: max-content;
+            animation: ticker 22s linear infinite;
+        }
+        .ticker-track:hover { animation-play-state: paused; }
+
+        /* ── Catalog card hover reveal ── */
+        .card-cta {
+            transform: translateY(12px);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease;
+        }
+        .product-card:hover .card-cta {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .product-card img {
+            transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+        }
+        .product-card:hover img {
+            transform: scale(1.06);
+        }
+
+        /* ── Glitch entrance for hero headline ── */
+        @keyframes glitch-in {
+            0%   { clip-path: inset(80% 0 0 0); transform: translateX(-4px); opacity: 0; }
+            30%  { clip-path: inset(40% 0 30% 0); transform: translateX(4px); }
+            60%  { clip-path: inset(0 0 60% 0); transform: translateX(-2px); opacity: 1; }
+            100% { clip-path: inset(0 0 0 0); transform: translateX(0); opacity: 1; }
+        }
+        .glitch-in { animation: glitch-in 0.8s cubic-bezier(0.16,1,0.3,1) both; }
+        .glitch-in-delay { animation: glitch-in 0.8s 0.2s cubic-bezier(0.16,1,0.3,1) both; }
+
+        /* ── Slide-up for hero sub-elements ── */
+        @keyframes slide-up {
+            from { transform: translateY(24px); opacity: 0; }
+            to   { transform: translateY(0);   opacity: 1; }
+        }
+        .slide-up-1 { animation: slide-up 0.7s 0.5s ease both; }
+        .slide-up-2 { animation: slide-up 0.7s 0.7s ease both; }
+        .slide-up-3 { animation: slide-up 0.7s 0.9s ease both; }
+
+        /* ── Size selector button ── */
+        .size-btn { transition: background 0.2s, color 0.2s, border-color 0.2s; }
+        .size-btn.selected, .size-btn:hover {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-white text-zinc-950 antialiased overflow-x-hidden w-full font-sans">
+
+    <!-- ░░ TOP TICKER ░░ -->
+    <div class="bg-zinc-950 text-white text-[11px] font-bold uppercase tracking-[0.2em] py-2.5 overflow-hidden select-none">
+        <div class="ticker-track">
+            <span class="mx-12">NEW DROP — OKTOBER 2026</span>
+            <span class="mx-12">FREE ONGKIR JAKARTA &amp; DEPOK</span>
+            <span class="mx-12">GRATIS TOTE BAG SETIAP PEMBELIAN &gt; Rp 500K</span>
+            <span class="mx-12">ORDER VIA WHATSAPP — RESPON CEPAT</span>
+            <span class="mx-12">STOK TERBATAS — JANGAN SAMPAI KEHABISAN</span>
+            <!-- duplicate for seamless loop -->
+            <span class="mx-12">NEW DROP — OKTOBER 2026</span>
+            <span class="mx-12">FREE ONGKIR JAKARTA &amp; DEPOK</span>
+            <span class="mx-12">GRATIS TOTE BAG SETIAP PEMBELIAN &gt; Rp 500K</span>
+            <span class="mx-12">ORDER VIA WHATSAPP — RESPON CEPAT</span>
+            <span class="mx-12">STOK TERBATAS — JANGAN SAMPAI KEHABISAN</span>
+        </div>
+    </div>
+
+    <!-- ░░ NAVBAR ░░ -->
+    <nav class="bg-white border-b border-zinc-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center h-16">
+            <a href="#" class="font-display text-3xl tracking-tight text-zinc-950">URBN.ST</a>
+
+            <div class="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-zinc-600">
+                <a href="#katalog" class="hover:text-zinc-950 transition-colors">Koleksi</a>
+                <a href="#lookbook" class="hover:text-zinc-950 transition-colors">Lookbook</a>
+                <a href="#ukuran" class="hover:text-zinc-950 transition-colors">Panduan Ukuran</a>
+            </div>
+
+            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order%20produk" target="_blank"
+               class="inline-flex items-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.793.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                Shop Now
+            </a>
+        </div>
+    </nav>
+
+    <!-- ░░ HERO — FULL BLEED SPLIT ░░ -->
+    <header class="min-h-[92vh] grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
+
+        <!-- Left: editorial copy -->
+        <div class="flex flex-col justify-center px-8 sm:px-14 lg:px-20 py-20 bg-white order-2 lg:order-1">
+            <p class="slide-up-1 text-xs font-bold uppercase tracking-[0.25em] text-zinc-500 mb-6">
+                New Arrival — Okt 2026
+            </p>
+            <h1 class="font-display leading-none mb-6 text-zinc-950">
+                <span class="glitch-in block text-[clamp(4rem,12vw,9rem)]">ESSENTIAL</span>
+                <span class="glitch-in-delay block text-[clamp(4rem,12vw,9rem)] text-zinc-300">STREET.</span>
+            </h1>
+            <p class="slide-up-2 text-base text-zinc-600 max-w-sm leading-relaxed mb-10">
+                Pakaian harian yang dibuat serius. Bahan premium, potongan pas di badan, dan desain yang tidak ketinggalan zaman setelah 3 tahun.
+            </p>
+            <div class="slide-up-3 flex flex-col sm:flex-row gap-3">
+                <a href="#katalog"
+                   class="inline-flex justify-center items-center gap-2 px-8 py-4 bg-zinc-950 text-white text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors">
+                    Lihat Koleksi
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+                <a href="#lookbook"
+                   class="inline-flex justify-center items-center px-8 py-4 border border-zinc-300 text-zinc-950 text-xs font-bold uppercase tracking-widest hover:border-zinc-950 transition-colors">
+                    Lihat Lookbook
+                </a>
+            </div>
+
+            <!-- Quick trust -->
+            <div class="mt-14 pt-8 border-t border-zinc-100 grid grid-cols-3 gap-4 text-center">
+                <div>
+                    <p class="font-display text-3xl text-zinc-950">500+</p>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mt-1">Order Selesai</p>
+                </div>
+                <div>
+                    <p class="font-display text-3xl text-zinc-950">4.9</p>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mt-1">Rating Pembeli</p>
+                </div>
+                <div>
+                    <p class="font-display text-3xl text-zinc-950">1 Hari</p>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mt-1">Proses Kirim</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: hero image -->
+        <div class="relative h-64 sm:h-96 lg:h-auto bg-zinc-100 overflow-hidden order-1 lg:order-2">
+            <img src="/assets/fashion_hero.jpg" alt="Editorial Fashion"
+                 class="w-full h-full object-cover object-top">
+            <!-- overlay tag -->
+            <div class="absolute bottom-6 left-6 bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest border border-zinc-200">
+                New Drop ↗
+            </div>
+        </div>
+
+    </header>
+
+    <!-- ░░ KATALOG PRODUK ░░ -->
+    <section id="katalog" class="py-20 md:py-28 bg-zinc-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14" data-aos="fade-up">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 block mb-2">Koleksi Aktif</span>
+                    <h2 class="font-display text-5xl md:text-6xl text-zinc-950 leading-none">KATALOG</h2>
+                </div>
+                <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20lihat%20katalog%20lengkap" target="_blank"
+                   class="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:opacity-60 transition-opacity shrink-0">
+                    Tanya Stok via WA →
+                </a>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+
+                <!-- Product 1: Sneaker -->
+                <div class="product-card group cursor-pointer" data-aos="fade-up" data-aos-delay="0">
+                    <div class="relative w-full aspect-[3/4] bg-zinc-200 overflow-hidden mb-4">
+                        <img src="/assets/fashion_sneaker.jpg" alt="Classic Red Sneakers" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 flex flex-col justify-end p-4">
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order%20Classic%20Red%20Sneakers%20Rp%20899.000" target="_blank"
+                               class="card-cta w-full py-2.5 bg-white text-zinc-950 text-[11px] font-bold uppercase tracking-widest text-center hover:bg-zinc-950 hover:text-white transition-colors">
+                                Pesan via WA
+                            </a>
+                        </div>
+                        <div class="absolute top-3 left-3 bg-zinc-950 text-white text-[9px] font-bold uppercase tracking-widest px-2 py-1">
+                            Best Seller
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1">Footwear</p>
+                    <h3 class="font-bold text-base leading-snug mb-1">Classic Red Sneakers</h3>
+                    <p class="text-sm font-bold text-zinc-950">Rp 899.000</p>
+                </div>
+
+                <!-- Product 2: Hoodie -->
+                <div class="product-card group cursor-pointer" data-aos="fade-up" data-aos-delay="80">
+                    <div class="relative w-full aspect-[3/4] bg-zinc-200 overflow-hidden mb-4">
+                        <img src="/assets/fashion_hoodie.jpg" alt="Oversized Hoodie" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 flex flex-col justify-end p-4">
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order%20Oversized%20Hoodie%20Rp%20450.000" target="_blank"
+                               class="card-cta w-full py-2.5 bg-white text-zinc-950 text-[11px] font-bold uppercase tracking-widest text-center hover:bg-zinc-950 hover:text-white transition-colors">
+                                Pesan via WA
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1">Tops</p>
+                    <h3 class="font-bold text-base leading-snug mb-1">Oversized Hoodie</h3>
+                    <p class="text-sm font-bold text-zinc-950">Rp 450.000</p>
+                </div>
+
+                <!-- Product 3: Watch -->
+                <div class="product-card group cursor-pointer" data-aos="fade-up" data-aos-delay="160">
+                    <div class="relative w-full aspect-[3/4] bg-zinc-200 overflow-hidden mb-4">
+                        <img src="/assets/fashion_watch.jpg" alt="Minimalist Watch" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 flex flex-col justify-end p-4">
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order%20Minimalist%20Watch%20Rp%201.250.000" target="_blank"
+                               class="card-cta w-full py-2.5 bg-white text-zinc-950 text-[11px] font-bold uppercase tracking-widest text-center hover:bg-zinc-950 hover:text-white transition-colors">
+                                Pesan via WA
+                            </a>
+                        </div>
+                        <div class="absolute top-3 left-3 bg-white text-zinc-950 text-[9px] font-bold uppercase tracking-widest px-2 py-1 border border-zinc-200">
+                            Limited
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1">Aksesoris</p>
+                    <h3 class="font-bold text-base leading-snug mb-1">Minimalist Watch</h3>
+                    <p class="text-sm font-bold text-zinc-950">Rp 1.250.000</p>
+                </div>
+
+                <!-- Product 4: Jacket -->
+                <div class="product-card group cursor-pointer" data-aos="fade-up" data-aos-delay="240">
+                    <div class="relative w-full aspect-[3/4] bg-zinc-200 overflow-hidden mb-4">
+                        <img src="/assets/fashion_jacket.jpg" alt="Denim Jacket" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 flex flex-col justify-end p-4">
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order%20Denim%20Jacket%20Rp%20650.000" target="_blank"
+                               class="card-cta w-full py-2.5 bg-white text-zinc-950 text-[11px] font-bold uppercase tracking-widest text-center hover:bg-zinc-950 hover:text-white transition-colors">
+                                Pesan via WA
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1">Outerwear</p>
+                    <h3 class="font-bold text-base leading-snug mb-1">Denim Jacket</h3>
+                    <p class="text-sm font-bold text-zinc-950">Rp 650.000</p>
+                </div>
+
+                <!-- Product 5: T-Shirt -->
+                <div class="product-card group cursor-pointer" data-aos="fade-up" data-aos-delay="0">
+                    <div class="relative w-full aspect-[3/4] bg-zinc-200 overflow-hidden mb-4">
+                        <img src="/assets/fashion_tshirt.jpg" alt="Essential Tee" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 flex flex-col justify-end p-4">
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order%20Essential%20Tee%20Rp%20250.000" target="_blank"
+                               class="card-cta w-full py-2.5 bg-white text-zinc-950 text-[11px] font-bold uppercase tracking-widest text-center hover:bg-zinc-950 hover:text-white transition-colors">
+                                Pesan via WA
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1">Tops</p>
+                    <h3 class="font-bold text-base leading-snug mb-1">Essential Tee</h3>
+                    <p class="text-sm font-bold text-zinc-950">Rp 250.000</p>
+                </div>
+
+                <!-- Product 6: Cap -->
+                <div class="product-card group cursor-pointer" data-aos="fade-up" data-aos-delay="80">
+                    <div class="relative w-full aspect-[3/4] bg-zinc-200 overflow-hidden mb-4">
+                        <img src="/assets/fashion_cap.jpg" alt="Structured Cap" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 flex flex-col justify-end p-4">
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order%20Structured%20Cap%20Rp%20175.000" target="_blank"
+                               class="card-cta w-full py-2.5 bg-white text-zinc-950 text-[11px] font-bold uppercase tracking-widest text-center hover:bg-zinc-950 hover:text-white transition-colors">
+                                Pesan via WA
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1">Aksesoris</p>
+                    <h3 class="font-bold text-base leading-snug mb-1">Structured Cap</h3>
+                    <p class="text-sm font-bold text-zinc-950">Rp 175.000</p>
+                </div>
+
+                <!-- Product 7: Bag (span 2 cols) -->
+                <div class="product-card group cursor-pointer col-span-2" data-aos="fade-up" data-aos-delay="160">
+                    <div class="relative w-full aspect-[2/1] sm:aspect-[3/2] bg-zinc-200 overflow-hidden mb-4">
+                        <img src="/assets/fashion_bag.jpg" alt="Canvas Tote Bag" class="w-full h-full object-cover object-center">
+                        <div class="absolute inset-0 flex flex-col justify-end p-4 sm:p-6">
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order%20Canvas%20Tote%20Bag%20Rp%20220.000" target="_blank"
+                               class="card-cta sm:w-56 w-full py-2.5 bg-white text-zinc-950 text-[11px] font-bold uppercase tracking-widest text-center hover:bg-zinc-950 hover:text-white transition-colors">
+                                Pesan via WA
+                            </a>
+                        </div>
+                        <div class="absolute top-4 left-4 bg-zinc-950 text-white text-[9px] font-bold uppercase tracking-widest px-2 py-1">
+                            Gratis dengan Pembelian ≥ Rp 500K
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1">Carry</p>
+                    <h3 class="font-bold text-base leading-snug mb-1">Canvas Tote Bag</h3>
+                    <p class="text-sm font-bold text-zinc-950">Rp 220.000</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ░░ LOOKBOOK — EDITORIAL STRIP ░░ -->
+    <section id="lookbook" class="py-20 md:py-28 bg-zinc-950 text-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+
+            <div class="flex flex-col lg:flex-row gap-12 items-center">
+
+                <!-- Copy -->
+                <div class="lg:w-5/12" data-aos="fade-right">
+                    <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 block mb-4">Lookbook — Okt 2026</span>
+                    <h2 class="font-display text-6xl md:text-8xl leading-none mb-8">
+                        STREET<br>READY.
+                    </h2>
+                    <p class="text-base text-zinc-400 leading-relaxed mb-8 max-w-sm">
+                        Setiap item dalam koleksi ini dicoba langsung di jalanan Jakarta, Bandung, dan Surabaya. Bukan sekedar foto studio, ini pakaian yang benar-benar kamu pakai.
+                    </p>
+                    <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20tertarik%20dengan%20koleksi%20Lookbook%20Oktober%202026" target="_blank"
+                       class="inline-flex items-center gap-3 border border-white text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-zinc-950 transition-colors">
+                        Order Koleksi Ini
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                </div>
+
+                <!-- Photo Grid -->
+                <div class="lg:w-7/12 grid grid-cols-2 gap-3" data-aos="fade-left">
+                    <div class="aspect-[3/4] bg-zinc-800 overflow-hidden">
+                        <img src="/assets/fashion_hoodie.jpg" alt="Lookbook 1" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500">
+                    </div>
+                    <div class="aspect-[3/4] bg-zinc-800 overflow-hidden mt-8">
+                        <img src="/assets/fashion_jacket.jpg" alt="Lookbook 2" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ░░ SIZE GUIDE ░░ -->
+    <section id="ukuran" class="py-20 md:py-24 bg-white border-b border-zinc-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-500 block mb-3">Panduan Ukuran</span>
+                <h2 class="font-display text-5xl text-zinc-950">PILIH UKURAN ANDA</h2>
+                <p class="text-sm text-zinc-600 mt-3">Klik ukuran di bawah, kami bantu cek ketersediaan stok langsung via WhatsApp.</p>
+            </div>
+
+            <div class="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 sm:p-10" data-aos="fade-up" data-aos-delay="100">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm mb-8">
+                    <div>
+                        <p class="font-bold uppercase tracking-wider text-xs text-zinc-500 mb-3">Ukuran → Lingkar Dada</p>
+                        <ul class="space-y-2 text-zinc-700">
+                            <li class="flex justify-between border-b border-zinc-200 pb-2"><span class="font-bold">S</span><span>86 – 90 cm</span></li>
+                            <li class="flex justify-between border-b border-zinc-200 pb-2"><span class="font-bold">M</span><span>91 – 96 cm</span></li>
+                            <li class="flex justify-between border-b border-zinc-200 pb-2"><span class="font-bold">L</span><span>97 – 102 cm</span></li>
+                            <li class="flex justify-between"><span class="font-bold">XL</span><span>103 – 110 cm</span></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="font-bold uppercase tracking-wider text-xs text-zinc-500 mb-3">Ukuran → Panjang Baju</p>
+                        <ul class="space-y-2 text-zinc-700">
+                            <li class="flex justify-between border-b border-zinc-200 pb-2"><span class="font-bold">S</span><span>67 cm</span></li>
+                            <li class="flex justify-between border-b border-zinc-200 pb-2"><span class="font-bold">M</span><span>70 cm</span></li>
+                            <li class="flex justify-between border-b border-zinc-200 pb-2"><span class="font-bold">L</span><span>73 cm</span></li>
+                            <li class="flex justify-between"><span class="font-bold">XL</span><span>76 cm</span></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="font-bold uppercase tracking-wider text-xs text-zinc-500 mb-3">Pilih & Tanya Stok</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20cek%20stok%20ukuran%20S" target="_blank"
+                               class="size-btn border border-zinc-300 text-center py-3 text-sm font-bold hover:bg-zinc-950 hover:text-white hover:border-zinc-950 transition-colors">S</a>
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20cek%20stok%20ukuran%20M" target="_blank"
+                               class="size-btn border border-zinc-300 text-center py-3 text-sm font-bold hover:bg-zinc-950 hover:text-white hover:border-zinc-950 transition-colors">M</a>
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20cek%20stok%20ukuran%20L" target="_blank"
+                               class="size-btn border border-zinc-300 text-center py-3 text-sm font-bold hover:bg-zinc-950 hover:text-white hover:border-zinc-950 transition-colors">L</a>
+                            <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20cek%20stok%20ukuran%20XL" target="_blank"
+                               class="size-btn border border-zinc-300 text-center py-3 text-sm font-bold hover:bg-zinc-950 hover:text-white hover:border-zinc-950 transition-colors">XL</a>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-xs text-zinc-500 text-center">
+                    Semua produk menggunakan bahan <b>Cotton Combed 30s</b> – tidak menyusut setelah dicuci. Jika ragu, pilih satu ukuran lebih besar.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ░░ FOOTER ░░ -->
+    <footer class="bg-zinc-950 text-white pt-16 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+
+            <div class="text-center max-w-lg mx-auto mb-14">
+                <h2 class="font-display text-6xl mb-4">URBN.ST</h2>
+                <p class="text-sm text-zinc-400 leading-relaxed mb-8">
+                    Streetwear lokal yang dibuat untuk dipakai, bukan dipajang. Semua produk limited-batch dan tidak direstok setelah habis.
+                </p>
+                <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order" target="_blank"
+                   class="inline-flex items-center gap-2 bg-white hover:bg-zinc-200 text-zinc-950 px-8 py-4 text-xs font-bold uppercase tracking-widest transition-colors">
+                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.793.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    Order via WhatsApp
+                </a>
+            </div>
+
+            <!-- Back to Cakcek -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 text-center max-w-xl mx-auto mb-10">
+                <p class="text-xs text-zinc-500 mb-3">Ini adalah halaman demo untuk kategori <b>Fashion & Retail</b>.</p>
+                <a href="/" class="inline-flex items-center gap-2 bg-white hover:bg-zinc-200 text-zinc-950 px-5 py-2 text-xs font-bold uppercase tracking-widest transition-colors">
+                    ← Kembali ke Cakcek
+                </a>
+            </div>
+
+            <p class="text-center text-xs text-zinc-600">&copy; 2026 URBN.ST. Demo Landing Page by Cakcek Studio.</p>
+        </div>
+    </footer>
+
+    <!-- Floating WA -->
+    <a href="https://wa.me/6281234567890?text=Halo%20URBN.ST%2C%20saya%20mau%20order" target="_blank"
+       class="fixed bottom-6 right-6 bg-[#25D366] hover:bg-emerald-600 text-white p-3.5 rounded-full shadow-lg z-50 transition transform hover:scale-105"
+       aria-label="Order via WhatsApp">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.793.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+    </a>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>AOS.init({ duration: 900, once: true, offset: 60, easing: 'ease-out-cubic' });</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+    --color-brand-blue: #2563EB;
+    --color-brand-slate: #475569;
+    --color-brand-black: #000000;
+    --font-sans: 'Inter', sans-serif;
+    --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* ==================================================
+   ANIMASI BACKGROUND & FLOAT
+   ================================================== */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delayed { animation: float 6s ease-in-out 3s infinite; }
+
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+    animation: spin-slow 25s linear infinite;
+}
+
+/* Radar & Subtle Architectural Circles */
+.bg-radar-grid {
+    background-image: 
+        radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        radial-gradient(circle at 50% 45%, transparent 160px, rgba(0, 0, 0, 0.04) 161px, rgba(0, 0, 0, 0.04) 162px, transparent 163px),
+        radial-gradient(circle at 50% 45%, transparent 320px, rgba(0, 0, 0, 0.03) 321px, rgba(0, 0, 0, 0.03) 322px, transparent 323px),
+        radial-gradient(circle at 50% 45%, transparent 480px, rgba(0, 0, 0, 0.025) 481px, rgba(0, 0, 0, 0.025) 482px, transparent 483px);
+    background-size: 100% 100%;
+}
+
+.bg-dot-pattern {
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 32px 32px;
+}
+
+/* Smooth micro-interactions */
+.smooth-btn {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                background-color 0.25s ease, 
+                border-color 0.25s ease, 
+                color 0.25s ease;
+}
+.smooth-btn:hover {
+    transform: translateY(-2px);
+}

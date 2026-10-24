@@ -1,0 +1,350 @@
+const fs = require('fs');
+
+const menus = [
+    { title: 'Es Kopi Susu Aren', cat: 'Signature', filter: 'signature', desc: 'Paduan sempurna espresso 100% Arabika pilihan, susu segar matang, dan manisnya legit gula aren murni dari petani lokal.', price: 'Rp 35.000', img: '/assets/coffee_hero.jpg', badge: '⭐ Best Seller' },
+    { title: 'Classic Butter Croissant', cat: 'Pastry', filter: 'pastry', desc: 'Dipanggang segar setiap pagi. Kaya akan lapisan mentega Prancis murni yang memberikan tekstur sangat renyah di luar namun lembut berongga di dalam.', price: 'Rp 28.000', img: '/assets/croissant.jpg', badge: '' },
+    { title: 'Kyoto Matcha Latte', cat: 'Non-Coffee', filter: 'non-coffee', desc: 'Menggunakan bubuk matcha seremonial asli dari Uji, Kyoto. Memberikan rasa earthy yang autentik, seimbang dengan tekstur susu.', price: 'Rp 40.000', img: '/assets/matcha.jpg', badge: '' },
+    { title: 'Manual Brew (V60)', cat: 'Single Origin', filter: 'signature', desc: 'Biji kopi spesialti yang diseduh secara presisi menggunakan metode V60. Menghasilkan secangkir kopi hitam yang jernih dengan notes buah.', price: 'Rp 45.000', img: '/assets/kopi_susu.jpg', badge: '' },
+    { title: 'Artisan Earl Grey Tea', cat: 'Tea', filter: 'non-coffee', desc: 'Teh hitam klasik dengan sentuhan minyak bergamot yang harum dan menenangkan, disajikan dengan irisan lemon segar.', price: 'Rp 30.000', img: '/assets/tea.jpg', badge: '' },
+    { title: 'Red Velvet Cake', cat: 'Cake', filter: 'pastry', desc: 'Kue lembut berwarna merah pekat berpadu dengan frosting cream cheese premium yang lumer di mulut.', price: 'Rp 45.000', img: '/assets/cake.jpg', badge: '✨ New' },
+    { title: 'Classic Affogato', cat: 'Dessert', filter: 'signature', desc: 'Dua scoop es krim vanilla Italia otentik yang disiram dengan segelas espresso panas yang kental dan kuat.', price: 'Rp 38.000', img: '/assets/affogato.jpg', badge: '' },
+    { title: 'Signature Hot Choco', cat: 'Non-Coffee', filter: 'non-coffee', desc: 'Cokelat hitam murni Belgia yang dilelehkan dengan susu steamed, memberikan sensasi hangat dan nyaman di setiap tegukan.', price: 'Rp 35.000', img: '/assets/choco.jpg', badge: '' },
+    { title: 'Beef Bacon Quiche', cat: 'Savory', filter: 'pastry', desc: 'Pai gurih ala Prancis berisi paduan telur, krim, keju gruyere leleh, dan irisan daging sapi asap yang melimpah.', price: 'Rp 42.000', img: '/assets/quiche.jpg', badge: '' },
+    { title: 'Caramel Macchiato', cat: 'Signature', filter: 'signature', desc: 'Susu vanilla hangat berselimut espresso pekat, dengan siraman saus karamel manis di bagian atasnya.', price: 'Rp 40.000', img: '/assets/macchiato.jpg', badge: '' },
+    { title: 'Almond Pain au Chocolat', cat: 'Pastry', filter: 'pastry', desc: 'Kue pastri cokelat klasik yang diperkaya dengan taburan kacang almond panggang renyah di atasnya.', price: 'Rp 32.000', img: '/assets/pain.jpg', badge: '' }
+];
+
+const html = `<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Kopi Senja - Premium Roastery</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0a0a0a',
+                            light: '#f9f9f9',
+                            gold: '#B89053'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { 
+            background-color: #f9f9f9; 
+            color: #0a0a0a;
+            overflow-x: hidden;
+        }
+        
+        /* Swiper Custom Styles */
+        .swiper-container {
+            width: 100%;
+            padding: 20px 0 80px 0;
+            overflow: hidden;
+            transform: translateZ(0);
+        }
+        
+        .swiper-slide {
+            transition: opacity 0.4s ease, box-shadow 0.4s ease;
+            opacity: 0.4;
+            border-radius: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .swiper-slide-active {
+            opacity: 1;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            z-index: 10;
+        }
+
+        .card-content {
+            transition: background-color 0.4s ease, color 0.4s ease;
+            background-color: white;
+            color: #0a0a0a;
+        }
+        
+        .card-desc {
+            transition: color 0.4s ease;
+            color: #6b7280;
+        }
+        
+        .card-price {
+            transition: color 0.4s ease;
+            color: #4b5563;
+        }
+        
+        .card-btn {
+            transition: all 0.4s ease;
+            background-color: transparent;
+            color: #0a0a0a;
+            border-color: #e5e7eb;
+        }
+
+        .swiper-slide-active .card-content {
+            background-color: #0a0a0a;
+            color: white;
+        }
+        .swiper-slide-active .card-desc {
+            color: #9ca3af;
+        }
+        .swiper-slide-active .card-price {
+            color: #B89053;
+        }
+        .swiper-slide-active .card-btn {
+            background-color: #B89053;
+            color: white;
+            border-color: #B89053;
+        }
+
+        .hero-mask {
+            mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+        }
+
+        /* Hide scrollbar */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Filter Active State */
+        .filter-btn.active {
+            background-color: #B89053;
+            border-color: #B89053;
+            color: white;
+        }
+    </style>
+</head>
+<body class="antialiased w-full relative">
+    
+    <!-- Navbar -->
+    <nav class="absolute top-0 left-0 w-full z-50 py-8 px-6 md:px-12">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="font-black text-2xl tracking-tighter font-serif text-brand-dark">
+                Kopi Senja.
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-semibold tracking-widest uppercase">
+                <a href="#about" class="hover:text-brand-gold transition-colors">Kisah Kami</a>
+                <a href="#menu" class="hover:text-brand-gold transition-colors">Koleksi Menu</a>
+            </div>
+            <a href="#menu" class="hidden md:inline-flex bg-brand-dark text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-brand-gold transition-colors">Pesan</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative min-h-[90vh] flex items-center justify-center pt-24 pb-12 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 md:px-12 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div data-aos="fade-up" data-aos-duration="1000">
+                <p class="text-brand-gold font-bold tracking-widest uppercase text-xs sm:text-sm mb-4">Artisan Coffee Roaster</p>
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif font-black leading-[1.05] mb-6 text-brand-dark">
+                    Eksklusif.<br>
+                    <span class="italic font-light">Autentik.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-500 mb-10 max-w-md font-light leading-relaxed">
+                    Nikmati mahakarya seduhan kopi premium, diracik khusus untuk memanjakan penikmat sejati. Langsung diantar ke meja Anda.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#menu" class="inline-flex justify-center items-center bg-brand-dark text-white px-8 py-4 rounded-full font-bold text-sm uppercase tracking-widest hover:bg-brand-gold transition-all duration-300">
+                        Jelajahi Menu
+                    </a>
+                </div>
+            </div>
+            
+            <div class="relative h-[500px] lg:h-[700px] w-full flex justify-center items-center" data-aos="fade-left" data-aos-duration="1200">
+                <div class="absolute w-72 h-72 rounded-full border border-gray-200 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                <div class="absolute w-96 h-96 rounded-full border border-gray-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                
+                <div class="relative w-full max-w-[400px] h-[110%] rounded-[3rem] overflow-hidden hero-mask flex flex-col gap-6">
+                    <img src="/assets/coffee_hero.jpg" alt="V60" class="w-full h-[280px] object-cover rounded-[2.5rem] shadow-xl">
+                    <img src="/assets/croissant.jpg" alt="Croissant" class="w-full h-[280px] object-cover rounded-[2.5rem] shadow-xl">
+                    <img src="/assets/matcha.jpg" alt="Matcha" class="w-full h-[280px] object-cover rounded-[2.5rem] shadow-xl">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Slider Menu Section -->
+    <section id="menu" class="py-24 bg-brand-dark text-white relative">
+        <div class="max-w-7xl mx-auto px-6 md:px-12 text-center mb-12" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-serif font-black mb-4">Menu Andalan Kami</h2>
+            <p class="text-gray-400 font-light max-w-lg mx-auto mb-8">Kurasi menu terbaik kami minggu ini. Diracik dengan presisi untuk pengalaman rasa yang tiada dua.</p>
+            
+            <!-- Category Pills (Fix Mobile Bug by padding left instead of centering blindly) -->
+            <div class="flex md:justify-center gap-3 overflow-x-auto pb-4 snap-x hide-scrollbar px-6 md:px-0" id="filter-container">
+                <button data-filter="all" class="filter-btn active shrink-0 border border-brand-gold bg-brand-gold text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-colors">
+                    Semua Menu
+                </button>
+                <button data-filter="signature" class="filter-btn shrink-0 border border-gray-700 hover:border-gray-500 text-gray-300 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-colors">
+                    Signature
+                </button>
+                <button data-filter="pastry" class="filter-btn shrink-0 border border-gray-700 hover:border-gray-500 text-gray-300 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-colors">
+                    Pastry
+                </button>
+                <button data-filter="non-coffee" class="filter-btn shrink-0 border border-gray-700 hover:border-gray-500 text-gray-300 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-colors">
+                    Non-Coffee
+                </button>
+            </div>
+        </div>
+
+        <!-- Swiper Container -->
+        <div class="swiper-container swiper-menu">
+            <div class="swiper-wrapper" id="swiper-wrapper">
+                <!-- Slides will be injected here via JS -->
+            </div>
+            
+            <div class="swiper-pagination mt-12 !relative !bottom-0"></div>
+        </div>
+    </section>
+
+    <!-- Promo Banner -->
+    <section class="bg-brand-gold py-16 text-center">
+        <h2 class="font-serif font-black text-4xl md:text-5xl text-brand-dark mb-6">
+            Duduk. Pesan. Nikmati.
+        </h2>
+        <p class="text-brand-dark/80 font-medium mb-8 max-w-lg mx-auto">Kami mengedepankan kualitas dan kecepatan. Pesan kopi favorit Anda sekarang tanpa harus mengantre panjang.</p>
+        <a href="#" class="inline-block bg-brand-dark text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:scale-105 transition-transform">
+            Order Sekarang
+        </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white py-12 border-t border-gray-100 text-center">
+        <h2 class="font-serif font-black text-2xl text-brand-dark mb-4">Kopi Senja.</h2>
+        <p class="text-gray-500 text-sm font-light mb-8">Disajikan dengan passion. Diantarkan dengan cinta.</p>
+        <div class="text-xs text-gray-400 uppercase tracking-widest">
+            &copy; 2026 Kopi Senja. Demo Landing Page by Cakcek.
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 50,
+        });
+
+        const menuData = ${JSON.stringify(menus)};
+        const wrapper = document.getElementById('swiper-wrapper');
+        let swiperInstance = null;
+
+        function renderSlides(filter = 'all') {
+            const filteredMenus = filter === 'all' ? menuData : menuData.filter(m => m.filter === filter);
+            
+            // To ensure infinite loop looks good on desktop, if filtered items are too few (< 6), duplicate them just for display
+            let displayMenus = [...filteredMenus];
+            if(displayMenus.length > 0 && displayMenus.length < 6) {
+                while(displayMenus.length < 6) {
+                    displayMenus = displayMenus.concat(filteredMenus);
+                }
+            }
+
+            wrapper.innerHTML = displayMenus.map(menu => \`
+                <div class="swiper-slide w-[300px] sm:w-[340px] md:w-[400px] bg-white rounded-3xl overflow-hidden group" style="will-change: transform;">
+                    <div class="h-64 sm:h-72 w-full overflow-hidden relative bg-gray-100">
+                        <img src="\${menu.img}" alt="\${menu.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy">
+                        \${menu.badge ? \`<div class="absolute top-4 right-4 bg-brand-gold text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">\${menu.badge}</div>\` : ''}
+                    </div>
+                    <div class="card-content p-6 sm:p-8 flex flex-col h-[320px]">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">\${menu.cat}</p>
+                        <h3 class="text-2xl font-serif font-bold mb-3">\${menu.title}</h3>
+                        <p class="card-desc text-sm font-light leading-relaxed mb-auto">\${menu.desc}</p>
+                        <div class="mt-6 flex items-center justify-between">
+                            <p class="card-price text-xl font-bold">\${menu.price}</p>
+                            <a href="https://wa.me/6281234567890" class="card-btn inline-block border px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest">Pesan</a>
+                        </div>
+                    </div>
+                </div>
+            \`).join('');
+
+            initSwiper();
+        }
+
+        function initSwiper() {
+            if(swiperInstance) {
+                swiperInstance.destroy(true, true);
+            }
+            
+            swiperInstance = new Swiper('.swiper-menu', {
+                effect: 'coverflow',
+                grabCursor: true,
+                centeredSlides: true,
+                slidesPerView: 'auto',
+                loop: true,
+                speed: 600,
+                spaceBetween: 30, // Added spacing to fix messy desktop overlap
+                watchSlidesProgress: true,
+                coverflowEffect: {
+                    rotate: 0,
+                    stretch: 0, // Removed negative stretch that caused messy overlapping
+                    depth: 50,  // Mild depth for a cleaner, flatter look
+                    modifier: 1, 
+                    scale: 0.9, 
+                    slideShadows: false,
+                },
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                breakpoints: {
+                    768: {
+                        spaceBetween: 40 // More space on desktop
+                    }
+                }
+            });
+        }
+
+        // Initialize Filter Logic
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active state
+                filterBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-brand-gold', 'border-brand-gold', 'text-white');
+                    b.classList.add('border-gray-700', 'text-gray-300');
+                });
+                const target = e.target;
+                target.classList.remove('border-gray-700', 'text-gray-300');
+                target.classList.add('active', 'bg-brand-gold', 'border-brand-gold', 'text-white');
+                
+                // Render new slides
+                const filterValue = target.getAttribute('data-filter');
+                renderSlides(filterValue);
+            });
+        });
+
+        // Initial Render
+        renderSlides('all');
+
+    </script>
+</body>
+</html>`;
+
+fs.writeFileSync('demos/kuliner.html', html, 'utf8');
+console.log('Successfully wrote updated HTML.');
