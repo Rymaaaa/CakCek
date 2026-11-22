@@ -17,4 +17,14 @@ export default defineConfig({
       partialDirectory: resolve(__dirname, 'src/components'),
     }),
   ],
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        kuliner: resolve(__dirname, 'demos/kuliner.html'),
+        jasa: resolve(__dirname, 'demos/jasa.html'),
+        retail: resolve(__dirname, 'demos/retail.html'),
+      },
+    },
+  },
 });
